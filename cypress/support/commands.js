@@ -1,25 +1,45 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add('getSelectors', function (container) {
+    // Seleccionar el contenedor
+    cy.get(container).then($container => {
+        const container = $container[0];
+        const elements = container.querySelectorAll('*');
+        const uniqueSelectors = new Set();
+
+        elements.forEach(el => {
+            // Agregar ID
+            if (el.id) {
+                uniqueSelectors.add(`#${el.id}`);
+            }
+
+            // Agregar clases
+            if (el.className) {
+                el.classList.forEach(cls => uniqueSelectors.add(`.${cls}`));
+            }
+
+            // Agregar tagName
+            const tagName = el.tagName.toLowerCase();
+            uniqueSelectors.add(tagName);
+
+            // Agregar data-membername
+            const dataMemberName = el.getAttribute('data-membername');
+            if (dataMemberName) {
+                uniqueSelectors.add(`[data-membername="${dataMemberName}"]`)
+            }
+
+            // Agregar placeholder
+            const placeholder = el.getAttribute('placeholder');
+            if (placeholder) {
+                uniqueSelectors.add([placeholder="${placeholder}"]);
+            }
+        });
+
+        // Mostrar los selectores únicos en la consola de Cypress
+        console.log([...uniqueSelectors].join('\n'));
+    });
+});
+
+Cypress.Commands.add('getContainerText', (container) => {
+    cy.get(container).each($container => {
+        console.log('${$container.text().trim()}',)
+    });
+})
